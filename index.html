@@ -1,0 +1,94 @@
+<div class="monolito-3d" id="MONOLITH">
+  <div class="estacion-visual" id="ESCENA-3D">
+    </div>
+
+  <div class="interface-panel">
+    <div style="font-size: 0.7rem; color: var(--CORE-MAGENTA); letter-spacing: 5px;">STATION: TRENDING3D_ROCKET</div>
+    <h1 class="título-alien">Z-ROCKET</h1>
+    <div class="desc-tactica">ACTIVO GLB CARGADO DESDE KERNEL_GITHUB.</div>
+    <div class="precio-vortex">ACTIVO_TACTICO</div>
+    <button class="btn-tactico">EXTRAER_DATOS</button>
+  </div>
+</div>
+
+<script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+    }
+  }
+</script>
+
+<style>
+  :root { --ALIEN-GREEN: #39FF14; --CORE-MAGENTA: #FF00FF; --VOID: #000; }
+  body { background: var(--VOID); margin: 0; overflow: hidden; font-family: 'JetBrains Mono', monospace; color: white; }
+  .monolito-3d { position: relative; width: 96vw; height: 92vh; margin: 4vh auto; border: 4px solid var(--ALIEN-GREEN); display: flex; background: #050505; }
+  .estacion-visual { flex: 2; position: relative; }
+  .interface-panel { flex: 1; padding: 40px; border-left: 4px solid var(--ALIEN-GREEN); background: #000; }
+  .título-alien { color: var(--ALIEN-GREEN); text-shadow: 2px 2px var(--CORE-MAGENTA); font-size: 3.5rem; margin: 0; }
+  .btn-tactico { border: 2px solid var(--ALIEN-GREEN); color: var(--ALIEN-GREEN); background: transparent; padding: 15px; width: 100%; cursor: pointer; font-weight: 900; margin-top: 20px; }
+</style>
+
+<script type="module">
+  import * as THREE from 'three';
+  import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+  /* [BLOQUE TS]: MOTOR DE PERSISTENCIA Z */
+  const contenedor = document.getElementById('ESCENA-3D');
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(75, contenedor.clientWidth / contenedor.clientHeight, 0.1, 1000);
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  
+  renderer.setSize(contenedor.clientWidth, contenedor.clientHeight);
+  contenedor.appendChild(renderer.domElement);
+
+  // ILUMINACIÓN NUCLEAR
+  scene.add(new THREE.AmbientLight(0xffffff, 1.5));
+  const spot = new THREE.PointLight(0x39FF14, 20);
+  spot.position.set(5, 5, 5);
+  scene.add(spot);
+
+  // CARGA DEL COHETE GLB
+  const loader = new GLTFLoader();
+  let rocket = null;
+
+  // CAMBIA ESTO POR EL NOMBRE EXACTO DE TU ARCHIVO EN GITHUB
+  const RUTA_ARCHIVO = './11688491.glb'; 
+
+  loader.load(RUTA_ARCHIVO, (gltf) => {
+    rocket = gltf.scene;
+    // AJUSTE DE ESCALA PARA QUE QUEDE PERFECTO EN EL MONOLITO
+    rocket.scale.set(2, 2, 2); 
+    scene.add(rocket);
+  });
+
+  camera.position.z = 5;
+
+  // [FÓRMULA Z]: CONTROL DE PERSISTENCIA POR MOUSE
+  let targetX = 0, targetY = 0, currentX = 0, currentY = 0;
+  const SUAVIZADO_Z = 0.05; // EL PESO DE LA PERSONALIDAD
+
+  document.addEventListener('mousemove', (e) => {
+    targetX = (e.clientX - window.innerWidth / 2) * 0.01;
+    targetY = (e.clientY - window.innerHeight / 2) * 0.01;
+  });
+
+  function animate() {
+    requestAnimationFrame(animate);
+    
+    // APLICACIÓN ASINTÓTICA DE LA FÓRMULA Z
+    currentX += (targetX - currentX) * SUAVIZADO_Z;
+    currentY += (targetY - currentY) * SUAVIZADO_Z;
+
+    if (rocket) {
+      rocket.rotation.y = currentX * 2;
+      rocket.rotation.x = currentY * 2;
+      // EFECTO FLOATING INTEGRADO EN EL KERNEL
+      rocket.position.y = Math.sin(Date.now() * 0.002) * 0.2;
+    }
+
+    renderer.render(scene, camera);
+  }
+  animate();
+</script>
